@@ -1,0 +1,16 @@
+{
+  "name": "mern-realtime-whitwboard-sharing-app",
+  "version": "1.0.0",
+  "description": "this is abckend for the mern realtime whitwboard sharing app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "author": "Naman Pandey",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  }
+}
