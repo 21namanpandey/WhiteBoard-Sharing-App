@@ -8,7 +8,7 @@ const CreateRoomForm = () => {
 
             <div className="from-group border ">
 
-                <div className="input-group d-flex align-items-center jusitfy-content-center ">
+                <div className="input-group d-flex align-items-center justify-content-center ">
 
                     <input type="text" className="form-control my-2 border-0" disabled placeholder="Generate Room Code" />
 
