@@ -1,12 +1,20 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import "./index.css"
 import WhiteBoard from "../../components/Whiteboard";
 
 const RoomPage = () => {
 
+    const canvasRef = useRef(null)
+    const ctxRef = useRef(null)
+
 
     const [tool, setTool] = useState("pencil");
     const [color, setColor] = useState("black");
+    const [elements, setElements] = useState()
+
+
+
+
 
 
 return (
@@ -52,7 +60,7 @@ return (
         </div>
 
         <div className="col-md-10 mx-auto mt-2 canvas-box">
-            <WhiteBoard/>
+            <WhiteBoard canvasRef={canvasRef} ctxRef={ctxRef} elements={elements} setElements={setElements} />
         </div>
 
     </div>
