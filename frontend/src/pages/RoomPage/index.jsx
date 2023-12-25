@@ -60,7 +60,7 @@ return (
         </div>
 
         <div className="col-md-10 mx-auto mt-2 canvas-box">
-            <WhiteBoard canvasRef={canvasRef} ctxRef={ctxRef} elements={elements} setElements={setElements} />
+            <WhiteBoard canvasRef={canvasRef} ctxRef={ctxRef} elements={elements} setElements={setElements} tool={tool} />
         </div>
 
     </div>
