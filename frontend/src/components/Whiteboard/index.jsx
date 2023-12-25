@@ -1,21 +1,25 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import "./index.css";
-import rough from 'roughjs';
-// import rough from "roughjs/bundled/rough.esm";
+// import rough from 'roughjs';
+import rough from "roughjs/bundled/rough.esm";
 
 const roughGenerator = rough.generator();
 
 
-const WhiteBoard = ({ canvasRef, ctxRef, elements, setElements, tool }) => {
+const WhiteBoard = ({ canvasRef, ctxRef, elements, setElements, tool, color }) => {
 
     const [isDrawing, setIsDrawing] = useState(false)
-    
+
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        canvas.height = window.innerHeight *2;
-        canvas.width = window.innerWidth *2;
+        canvas.height = window.innerHeight * 2;
+        canvas.width = window.innerWidth * 2;
         const ctx = canvas.getContext("2d");
+
+        ctx.strokeStyle = color;
+        ctx.linewidth = 2;
+        ctx.lineCap = "round";
 
         ctxRef.current = ctx;
     }, [])
@@ -29,12 +33,16 @@ const WhiteBoard = ({ canvasRef, ctxRef, elements, setElements, tool }) => {
 
     // }, [elements])
 
+    useEffect(() => {
+        ctxRef.current.strokeStyle = color;
+    }, [color])
+
     useLayoutEffect(() => {
         if (elements) {
             const roughCanvas = rough.canvas(canvasRef.current);
 
             if(elements.length > 0){
-                ctxRef.current.clearRect(0,0,canvasRef.current,width, canvasRef.current.height);
+                ctxRef.current.clearRect(0,0,canvasRef.current.width, canvasRef.current.height);
             }
 
             elements.forEach((element) => {
@@ -45,20 +53,37 @@ const WhiteBoard = ({ canvasRef, ctxRef, elements, setElements, tool }) => {
                             element.offsetX,
                             element.offsetY,
                             element.width,
-                            element.height
+                            element.height,
+                            {
+                                stroke: element.stroke,
+                                strokeWidth: 5,
+                                roughness: 0
+                            }
                         )
                     );
                 }
                 else if(element.type === "pencil"){
-                    roughCanvas.linearPath(element.type);
+                    roughCanvas.linearPath(element.type, {
+                        stroke: element.stroke,
+                        strokeWidth: 5,
+                        roughness: 0
+                    }
+                );
                 }
+
                 else if (element.type === "line"){
                     roughCanvas.draw(
                         roughGenerator.line(
                             element.offsetX, 
                             element.offsetY, 
                             element.width, 
-                            element.height
+                            element.height,
+                            {
+                                stroke: element.stroke,
+                                strokeWidth: 5,
+                                roughness: 0,
+                            },
+
                         )
                     );
                 }
@@ -67,47 +92,49 @@ const WhiteBoard = ({ canvasRef, ctxRef, elements, setElements, tool }) => {
     }, [elements]);
 
 
+
     const handleMouseDown = (e) => {
         const { offsetX, offsetY } = e.nativeEvent;
 
 
-        if(tool === "pencil"){
+        if (tool === "pencil") {
             setElements((prevElements) => [
-                ...prevElements,
+                ...prevElements || [],
                 {
                     type: "pencil",
                     offsetX,
                     offsetY,
                     path: [[offsetX, offsetY]],
-                    stroke: "black",
+                    stroke: color,
                 },
             ]);
+
         }
-        
-        else if(tool === "line"){
-            setElements((prevElements)=>[
-                ...prevElements,
+
+        else if (tool === "line") {
+            setElements((prevElements) => [
+                ...prevElements || [],
                 {
                     type: "line",
                     offsetX,
                     offsetY,
                     width: offsetX,
                     height: offsetY,
-                    stroke: "black"
+                    stroke: color,
                 },
             ]);
         }
 
-        else if(tool === "rect"){
-            setElements((prevElements)=>[
-                ...prevElements,
+        else if (tool === "rect") {
+            setElements((prevElements) => [
+                ...prevElements || [],
                 {
                     type: "rect",
                     offsetX,
                     offsetY,
                     width: 0,
                     height: 0,
-                    stroke: "black"
+                    stroke: color,
                 },
             ]);
         }
@@ -119,30 +146,30 @@ const WhiteBoard = ({ canvasRef, ctxRef, elements, setElements, tool }) => {
     const handleMouseMove = (e) => {
         const { offsetX, offsetY } = e.nativeEvent;
 
-        if (isDrawing) {            
+        if (isDrawing) {
 
 
-            if(tool === "pencil"){
+            if (tool === "pencil") {
                 const { path } = elements[elements.length - 1]
                 const newPath = [...path, [offsetX, offsetY]]
                 setElements((prevElements) =>
-                prevElements.map((ele, index) => {
-                    if (index === elements.length - 1) {
-                        return {
-                            ...ele,
-                            path: newPath,
-                        };
-                    } else {
-                        return ele;
-                    }
-                })
-            )
+                    prevElements.map((ele, index) => {
+                        if (index === elements.length - 1) {
+                            return {
+                                ...ele,
+                                path: newPath,
+                            };
+                        } else {
+                            return ele;
+                        }
+                    })
+                )
             }
 
-            else if(tool==="line"){
-                setElements((prevElements)=>
-                    prevElements.map((ele, index)=>{
-                        if(index === elements.length-1){
+            else if (tool === "line") {
+                setElements((prevElements) =>
+                    prevElements.map((ele, index) => {
+                        if (index === elements.length - 1) {
                             return {
                                 ...ele,
                                 width: offsetX,
@@ -155,10 +182,10 @@ const WhiteBoard = ({ canvasRef, ctxRef, elements, setElements, tool }) => {
                 )
             }
 
-            else if(tool==="rect"){
-                setElements((prevElements)=>
-                    prevElements.map((ele, index)=>{
-                        if(index === elements.length-1){
+            else if (tool === "rect") {
+                setElements((prevElements) =>
+                    prevElements.map((ele, index) => {
+                        if (index === elements.length - 1) {
                             return {
                                 ...ele,
                                 width: offsetX - ele.offsetX,
@@ -188,10 +215,10 @@ const WhiteBoard = ({ canvasRef, ctxRef, elements, setElements, tool }) => {
             onMouseUp={handleMouseUp}
             className="border border-dark border-3 overflow-hidden  w-100 whiteboard-box">
             <canvas
-            ref={canvasRef}
+                ref={canvasRef}
             />
         </div>
-        
+
 
 
     )
