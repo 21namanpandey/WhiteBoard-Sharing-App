@@ -1,12 +1,28 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import "./index.css";
-// import rough from 'roughjs';
-import rough from "roughjs/bundled/rough.esm";
+import rough from 'roughjs';
+// import rough from "roughjs/bundled/rough.esm";
 
 const roughGenerator = rough.generator();
 
 
-const WhiteBoard = ({ canvasRef, ctxRef, elements, setElements, tool, color }) => {
+const WhiteBoard = ({ canvasRef, ctxRef, elements, setElements, tool, color, user, socket }) => {
+
+    const [img, setImg] = useState(null);
+
+    useEffect(()=>{
+        socket.on("whiteBoardDataResponse", (data)=>{
+            setImg(data.imgURL);
+        })
+    }, [])
+
+    if (!user?.presenter) {
+        return (
+            <div className="border border-dark border-3 overflow-hidden  w-100 whiteboard-box">
+                <img src={img} alt="Real time whiteboard image shared by presenter" className="w-100 h-100" />
+            </div>
+        )
+    }
 
     const [isDrawing, setIsDrawing] = useState(false)
 
@@ -33,61 +49,73 @@ const WhiteBoard = ({ canvasRef, ctxRef, elements, setElements, tool, color }) =
 
     // }, [elements])
 
+
     useEffect(() => {
         ctxRef.current.strokeStyle = color;
     }, [color])
 
     useLayoutEffect(() => {
-        if (elements) {
-            const roughCanvas = rough.canvas(canvasRef.current);
+        if (canvasRef) {
 
-            if(elements.length > 0){
-                ctxRef.current.clearRect(0,0,canvasRef.current.width, canvasRef.current.height);
+
+            if (elements) {
+                const roughCanvas = rough.canvas(canvasRef.current);
+
+                if (elements.length > 0) {
+                    ctxRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+                }
+
+                elements.forEach((element) => {
+
+                    if (element.type === "rect") {
+                        roughCanvas.draw(
+                            roughGenerator.rectangle(
+                                element.offsetX,
+                                element.offsetY,
+                                element.width,
+                                element.height,
+                                {
+                                    stroke: element.stroke,
+                                    strokeWidth: 5,
+                                    roughness: 0
+                                }
+                            )
+                        );
+                    }
+                    else if (element.type === "pencil") {
+                        roughCanvas.linearPath(element.type, {
+                            stroke: element.stroke,
+                            strokeWidth: 5,
+                            roughness: 0
+                        }
+                        );
+                    }
+
+                    else if (element.type === "line") {
+                        roughCanvas.draw(
+                            roughGenerator.line(
+                                element.offsetX,
+                                element.offsetY,
+                                element.width,
+                                element.height,
+                                {
+                                    stroke: element.stroke,
+                                    strokeWidth: 5,
+                                    roughness: 0,
+                                },
+
+                            )
+                        );
+                    }
+                });
             }
 
-            elements.forEach((element) => {
+            // const  canvasImage = canvasRef.current.toDefault();
+            // socket.emit("whiteboardData", canvasImage)
 
-                if(element.type === "rect"){
-                    roughCanvas.draw(
-                        roughGenerator.rectangle(
-                            element.offsetX,
-                            element.offsetY,
-                            element.width,
-                            element.height,
-                            {
-                                stroke: element.stroke,
-                                strokeWidth: 5,
-                                roughness: 0
-                            }
-                        )
-                    );
-                }
-                else if(element.type === "pencil"){
-                    roughCanvas.linearPath(element.type, {
-                        stroke: element.stroke,
-                        strokeWidth: 5,
-                        roughness: 0
-                    }
-                );
-                }
+            const canvasImage = canvasRef.current.toDataURL();
+            socket.emit("whiteboardData", canvasImage);
 
-                else if (element.type === "line"){
-                    roughCanvas.draw(
-                        roughGenerator.line(
-                            element.offsetX, 
-                            element.offsetY, 
-                            element.width, 
-                            element.height,
-                            {
-                                stroke: element.stroke,
-                                strokeWidth: 5,
-                                roughness: 0,
-                            },
-
-                        )
-                    );
-                }
-            });
         }
     }, [elements]);
 
@@ -207,13 +235,14 @@ const WhiteBoard = ({ canvasRef, ctxRef, elements, setElements, tool, color }) =
     }
 
 
+
     return (
 
         <div
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
-            className="border border-dark border-3 overflow-hidden  w-100 whiteboard-box">
+            className="border border-dark border-3 overflow-hidden  w-100 whiteboard-box ">
             <canvas
                 ref={canvasRef}
             />
