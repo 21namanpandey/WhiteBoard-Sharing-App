@@ -19,7 +19,13 @@ const WhiteBoard = ({ canvasRef, ctxRef, elements, setElements, tool, color, use
     if (!user?.presenter) {
         return (
             <div className="border border-dark border-3 overflow-hidden  w-100 whiteboard-box">
-                <img src={img} alt="Real time whiteboard image shared by presenter" className="w-100 h-100" />
+                <img src={img} alt="Real time whiteboard image shared by presenter" 
+                // className="w-100 h-100" 
+                style={{
+                    height: window.innerHeight * 2,
+                    width: "285%",
+                }}
+                />
             </div>
         )
     }
