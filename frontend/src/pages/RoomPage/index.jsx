@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import "./index.css"
 import WhiteBoard from "../../components/Whiteboard";
 
@@ -51,13 +51,13 @@ const RoomPage = ({ user, socket, users }) => {
     return (
         <div className="row">
 
-            <button type="button" onClick={()=>{setOpenedUserTab(true)}} className="btn btn-dark 5" style={{ display: "block", position: "absolute", top: "5%", left: "5%", height: "40px", width: "100px" }}>
+            <button type="button" onClick={() => { setOpenedUserTab(true) }} className="btn btn-dark 5" style={{ display: "block", position: "absolute", top: "5%", left: "5%", height: "40px", width: "100px" }}>
                 Users
             </button>
             {
                 openedUserTab && (
                     <div className="position-fixed top-0  h-100 text-white bg-dark" style={{ width: "250px", left: "0%" }}>
-                        <button type="button" onClick={()=>{setOpenedUserTab(false)}} className="btn btn-light btn-block w-100 mt-5">
+                        <button type="button" onClick={() => { setOpenedUserTab(false) }} className="btn btn-light btn-block w-100 mt-5">
                             Close
                         </button>
                         <div className="w-100 mt-5 pt-5">

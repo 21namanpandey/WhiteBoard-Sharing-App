@@ -1,5 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import io from "socket.io-client"
+import "react-toastify/dist/ReactToastify.css";
+import {ToastContainer, toast} from "react-toastify";
 
 import './App.css'
 
@@ -38,7 +40,18 @@ const App = () =>  {
 
     socket.on("allUsers", (data) => {
       setUsers(data)
+    });
+
+    socket.on("userJoinedMessageBraodcasted", (data)=>{
+      console.log(`${data} joined the room`);
+      toast.info(`${data} joined the room`);
+    });
+
+    socket.on("userLeftMessageBroadcasted" , (data) => {
+      console.log(`${data} left the room`);
+      toast.info(`${data} left the room`);
     })
+
   }, [])
 
   const uuid = () => {
@@ -66,6 +79,7 @@ const App = () =>  {
 
 
     <div className='container'>
+      <ToastContainer/>
       <Routes>
         <Route path="/" element={<Forms uuid={uuid} socket={socket} setUser={setUser} />} />
         <Route path="/:roomId" element={<RoomPage user={user} socket={socket} users={users} />} />
