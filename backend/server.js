@@ -41,8 +41,8 @@ io.on("connection", (socket) => {
         const {message} = data;
         const user = getUser(socket.id)
         if (user) {
-            removeUser(socket.id);
-            socket.broadcast;
+            // removeUser(socket.id);
+            // socket.broadcast;
             socket.broadcast.to(roomIdGlobal).emit("messageResponse", {message, name: user.name});
         }
     })
