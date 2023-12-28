@@ -28,12 +28,24 @@ io.on("connection", (socket) => {
         });
     });
 
+
+
     socket.on("whiteboardData", (data) => {
         imgURLGlobal = data;
         socket.broadcast.to(roomIdGlobal).emit("whiteBoardDataResponse", {
             imgURL: data,
         });
     });
+
+    socket.on("message", (data)=> {
+        const {message} = data;
+        const user = getUser(socket.id)
+        if (user) {
+            removeUser(socket.id);
+            socket.broadcast;
+            socket.broadcast.to(roomIdGlobal).emit("messageResponse", {message, name: user.name});
+        }
+    })
 
     socket.on("disconnect", () => {
         const user = getUser(socket.id)

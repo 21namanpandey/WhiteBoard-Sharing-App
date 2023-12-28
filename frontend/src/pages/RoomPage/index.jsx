@@ -80,7 +80,7 @@ const RoomPage = ({ user, socket, users }) => {
 
             {
                 openedChatTab && (
-                    <Chat setOpenedChatTab={setOpenedChatTab}/>
+                    <Chat setOpenedChatTab={setOpenedChatTab} socket={socket}/>
                 )
             }
 
