@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import "./index.css"
 import WhiteBoard from "../../components/Whiteboard";
+import Chat from "../../components/chatBar";
 
 const RoomPage = ({ user, socket, users }) => {
 
@@ -12,6 +13,7 @@ const RoomPage = ({ user, socket, users }) => {
     const [color, setColor] = useState("#000000");
     const [elements, setElements] = useState([]);
     const [openedUserTab, setOpenedUserTab] = useState(false)
+    const [openedChatTab, setOpenedChatTab] = useState(false)
 
     const [history, setHistory] = useState([]);
 
@@ -51,9 +53,14 @@ const RoomPage = ({ user, socket, users }) => {
     return (
         <div className="row">
 
-            <button type="button" onClick={() => { setOpenedUserTab(true) }} className="btn btn-dark 5" style={{ display: "block", position: "absolute", top: "5%", left: "5%", height: "40px", width: "100px" }}>
+            <button type="button" onClick={() => { setOpenedUserTab(true) }} className="btn btn-dark 5" style={{ display: "block", position: "absolute", top: "3%", left: "2%", height: "40px", width: "100px" }}>
                 Users
             </button>
+
+            <button type="button" onClick={() => { setOpenedChatTab(true) }} className="btn btn-primary 5" style={{ display: "block", position: "absolute", top: "3%", left: "10%", height: "40px", width: "100px" }}>
+                Chats
+            </button>
+
             {
                 openedUserTab && (
                     <div className="position-fixed top-0  h-100 text-white bg-dark" style={{ width: "250px", left: "0%" }}>
@@ -68,6 +75,12 @@ const RoomPage = ({ user, socket, users }) => {
                             }
                         </div>
                     </div>
+                )
+            }
+
+            {
+                openedChatTab && (
+                    <Chat setOpenedChatTab={setOpenedChatTab}/>
                 )
             }
 
